@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Reservas PRO</title>
 
 <style>
@@ -33,10 +32,6 @@ button {
   margin: 10px;
   border-radius: 10px;
 }
-
-.ocupado {
-  background: red;
-}
 </style>
 </head>
 
@@ -53,7 +48,7 @@ button {
 <select id="servicio">
 <option>Lavado básico $50</option>
 <option>Lavado completo $80</option>
-<option>Motor $200</option>
+<option>Lavado motor $200</option>
 <option>Desmanchado $1200</option>
 </select>
 
@@ -63,9 +58,16 @@ button {
 <div id="lista"></div>
 
 <script>
-let numero = "5217227181026";
+let numero = "5217227181026"; // 🔥 TU NÚMERO CORRECTO
 
 let horas = ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00"];
+
+window.onload = function() {
+  cargarHoras();
+  mostrar();
+};
+
+document.getElementById("fecha").addEventListener("change", cargarHoras);
 
 function cargarHoras() {
   let select = document.getElementById("hora");
@@ -87,8 +89,6 @@ function cargarHoras() {
   });
 }
 
-document.getElementById("fecha").addEventListener("change", cargarHoras);
-
 function reservar() {
   let nombre = document.getElementById("nombre").value;
   let telefono = document.getElementById("telefono").value;
@@ -103,7 +103,6 @@ function reservar() {
 
   let citas = JSON.parse(localStorage.getItem("citas")) || [];
 
-  // ❌ EVITAR DUPLICADOS
   let existe = citas.find(c => c.fecha === fecha && c.hora === hora);
   if (existe) {
     alert("Horario ocupado ❌");
@@ -113,6 +112,7 @@ function reservar() {
   citas.push({nombre, telefono, fecha, hora, servicio});
   localStorage.setItem("citas", JSON.stringify(citas));
 
+  cargarHoras();
   mostrar();
 
   let msg = 🚗 Nueva cita %0A${nombre} %0A${fecha} ${hora} %0A${servicio};
@@ -135,8 +135,6 @@ function mostrar() {
     `;
   });
 }
-
-mostrar();
 </script>
 
 </body>
