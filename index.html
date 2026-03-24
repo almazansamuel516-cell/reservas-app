@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reservas PRO</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0a0a0a;
+  color: white;
+  text-align: center;
+}
+
+input, select, button {
+  width: 90%;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  background: #00e676;
+  font-weight: bold;
+}
+
+.card {
+  background: #1c1c1c;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+.ocupado {
+  background: red;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🚗 Detallado Automotriz</h2>
+
+<input id="nombre" placeholder="Nombre">
+<input id="telefono" placeholder="Teléfono">
+<input type="date" id="fecha">
+
+<select id="hora"></select>
+
+<select id="servicio">
+<option>Lavado básico $50</option>
+<option>Lavado completo $80</option>
+<option>Motor $200</option>
+<option>Desmanchado $1200</option>
+</select>
+
+<button onclick="reservar()">Reservar</button>
+
+<h3>📊 Citas</h3>
+<div id="lista"></div>
+
+<script>
+let numero = "5217227181026";
+
+let horas = ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00"];
+
+function cargarHoras() {
+  let select = document.getElementById("hora");
+  select.innerHTML = "";
+
+  let fecha = document.getElementById("fecha").value;
+  let citas = JSON.parse(localStorage.getItem("citas")) || [];
+
+  horas.forEach(h => {
+    let ocupado = citas.find(c => c.fecha === fecha && c.hora === h);
+
+    let option = document.createElement("option");
+    option.value = h;
+    option.textContent = ocupado ? h + " (ocupado)" : h;
+
+    if (ocupado) option.disabled = true;
+
+    select.appendChild(option);
+  });
+}
+
+document.getElementById("fecha").addEventListener("change", cargarHoras);
+
+function reservar() {
+  let nombre = document.getElementById("nombre").value;
+  let telefono = document.getElementById("telefono").value;
+  let fecha = document.getElementById("fecha").value;
+  let hora = document.getElementById("hora").value;
+  let servicio = document.getElementById("servicio").value;
+
+  if (!nombre || !telefono || !fecha || !hora) {
+    alert("Completa todos los campos");
+    return;
+  }
+
+  let citas = JSON.parse(localStorage.getItem("citas")) || [];
+
+  // ❌ EVITAR DUPLICADOS
+  let existe = citas.find(c => c.fecha === fecha && c.hora === hora);
+  if (existe) {
+    alert("Horario ocupado ❌");
+    return;
+  }
+
+  citas.push({nombre, telefono, fecha, hora, servicio});
+  localStorage.setItem("citas", JSON.stringify(citas));
+
+  mostrar();
+
+  let msg = 🚗 Nueva cita %0A${nombre} %0A${fecha} ${hora} %0A${servicio};
+  window.open(https://wa.me/${numero}?text=${msg});
+}
+
+function mostrar() {
+  let lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  let citas = JSON.parse(localStorage.getItem("citas")) || [];
+
+  citas.forEach(c => {
+    lista.innerHTML += `
+      <div class="card">
+        👤 ${c.nombre} <br>
+        📅 ${c.fecha} ${c.hora} <br>
+        🧼 ${c.servicio}
+      </div>
+    `;
+  });
+}
+
+mostrar();
+</script>
+
+</body>
+</html>
